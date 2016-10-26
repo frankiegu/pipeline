@@ -8,10 +8,10 @@ FROM ubuntu:14.04
 #   It's highly-advised that you run this distributed of Docker/Ubuntu on whatever host system you are running (ie. RHEL, CentOS, etc)
 
 # These are environment variables that match the versions of the sofware tools installed by this Dockerfile.
-# We also need to include library dependency versions as we trigger a build of all Scala/Java-based source code 
+# We also need to include library dependency versions as we trigger a build of all Scala/Java-based source code
 #  at the end in order to pre-bake the dependencies into the Docker image.  This saves time and network bandwidth later.
 #
-ENV \ 
+ENV \
  CASSANDRA_VERSION=2.2.6 \
  CONFLUENT_VERSION=3.0.0 \
  ELASTICSEARCH_VERSION=2.3.0 \
@@ -47,13 +47,13 @@ ENV \
  JBLAS_VERSION=1.2.4 \
  GRAPHFRAMES_VERSION=0.1.0-spark1.6 \
  FLINK_VERSION=1.0.0 \
- BAZEL_VERSION=0.3.0 \ 
- TENSORFLOW_VERSION=0.10.0 \
- TENSORFLOW_SERVING_VERSION=0.4.1 \
-# JAVA_HOME required here (versus config/bash/pipeline.bashrc) 
-#   in order to properly install Bazel (used by TensorFlow) 
+ BAZEL_VERSION=0.3.2 \
+ TENSORFLOW_VERSION=master \
+ TENSORFLOW_SERVING_VERSION=master \
+# JAVA_HOME required here (versus config/bash/pipeline.bashrc)
+#   in order to properly install Bazel (used by TensorFlow)
  JAVA_HOME=/usr/lib/jvm/java-8-oracle \
- FINAGLE_VERSION=6.34.0 \ 
+ FINAGLE_VERSION=6.34.0 \
  HYSTRIX_VERSION=1.5.3 \
  HYSTRIX_DASHBOARD_VERSION=1.5.3 \
  INDEXEDRDD_VERSION=0.3 \
@@ -140,7 +140,7 @@ RUN \
 
 # OpenBLAS
 # Note:  This is a generically-tuned version of OpenBLAS for Linux
-#        For the best performance, follow the instructions here:  
+#        For the best performance, follow the instructions here:
 #           https://github.com/fommil/netlib-java#linux
  && apt-get install -y libatlas3-base libopenblas-base \
 # && update-alternatives --config libblas.so \
@@ -154,7 +154,7 @@ RUN \
  && gpg -a --export E084DAB9 | apt-key add - \
  && apt-get update \
  && apt-get install -y r-base \
- && apt-get install -y r-base-dev 
+ && apt-get install -y r-base-dev
 
 RUN \
 # libcurl (required to install.packages('devtools') in R)
@@ -163,7 +163,7 @@ RUN \
  && R -e "install.packages(c('pbdZMQ','rzmq','repr', 'devtools'), type = 'source', repos = c('http://cran.us.r-project.org', 'http://irkernel.github.io/'))" \
  && R -e "devtools::install_github('IRkernel/IRdisplay')" \
  && R -e "devtools::install_github('IRkernel/IRkernel')" \
- && R -e "IRkernel::installspec(user = FALSE)" 
+ && R -e "IRkernel::installspec(user = FALSE)"
 
 RUN \
 # Ganglia
@@ -172,7 +172,7 @@ RUN \
 # MySql (Required by Hive Metastore)
  && DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server \
  && apt-get install -y mysql-client \
- && apt-get install -y libmysql-java 
+ && apt-get install -y libmysql-java
 
 # Bazel (Required for TensorFlow Serving)
 RUN \
@@ -180,21 +180,21 @@ RUN \
  && wget https://github.com/bazelbuild/bazel/releases/download/$BAZEL_VERSION/bazel-$BAZEL_VERSION-installer-linux-x86_64.sh \
  && chmod +x bazel-$BAZEL_VERSION-installer-linux-x86_64.sh \
  && ./bazel-$BAZEL_VERSION-installer-linux-x86_64.sh --bin=/root/bazel-$BAZEL_VERSION/bin \
- && rm bazel-$BAZEL_VERSION-installer-linux-x86_64.sh 
+ && rm bazel-$BAZEL_VERSION-installer-linux-x86_64.sh
 
 RUN \
  cd ~ \
- && git clone -b $TENSORFLOW_SERVING_VERSION --single-branch --recurse-submodules https://github.com/tensorflow/serving.git 
+ && git clone -b $TENSORFLOW_SERVING_VERSION --single-branch --recurse-submodules https://github.com/tensorflow/serving.git
 
 # TensorFlow Source
 RUN \
  cd ~ \
- && git clone -b v$TENSORFLOW_VERSION --single-branch --recurse-submodules https://github.com/tensorflow/tensorflow.git 
+ && git clone -b v$TENSORFLOW_VERSION --single-branch --recurse-submodules https://github.com/tensorflow/tensorflow.git
 
 # Python NetworkX/Tribe Demos
-RUN \ 
+RUN \
 # pip install --upgrade tribe \
- pip install --upgrade seaborn 
+ pip install --upgrade seaborn
 
 RUN \
 # Get Latest Pipeline Code
@@ -207,7 +207,7 @@ RUN \
  && echo "# Pipeline-specific" >> ~/.bashrc \
  && echo "if [ -f ~/pipeline/config/bash/pipeline.bashrc ]; then" >> ~/.bashrc \
  && echo "   . ~/pipeline/config/bash/pipeline.bashrc" >> ~/.bashrc \
- && echo "fi" >> ~/.bashrc 
+ && echo "fi" >> ~/.bashrc
 
 RUN \
 # Sbt
@@ -292,7 +292,7 @@ RUN \
 
 # Apache Hadoop
  && cd ~ \
- && wget http://www.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz \ 
+ && wget http://www.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz \
  && tar xvzf hadoop-${HADOOP_VERSION}.tar.gz \
  && rm hadoop-${HADOOP_VERSION}.tar.gz \
 
@@ -322,7 +322,7 @@ RUN \
  && cd ~ \
  && wget https://repo1.maven.org/maven2/com/facebook/presto/presto-server/${PRESTO_VERSION}/presto-server-${PRESTO_VERSION}.tar.gz \
  && tar xvzf presto-server-${PRESTO_VERSION}.tar.gz \
- && rm presto-server-${PRESTO_VERSION}.tar.gz \ 
+ && rm presto-server-${PRESTO_VERSION}.tar.gz \
  && cd presto-server-${PRESTO_VERSION}/bin \
  && wget https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/${PRESTO_VERSION}/presto-cli-${PRESTO_VERSION}-executable.jar \
  && mv presto-cli-${PRESTO_VERSION}-executable.jar presto \
@@ -350,22 +350,22 @@ RUN \
  && sudo make install \
 
 # Jenkins
- && wget -q -O - http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key | sudo apt-key add - \ 
- && echo "deb http://pkg.jenkins-ci.org/debian binary/" >> /etc/apt/sources.list \ 
+ && wget -q -O - http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key | sudo apt-key add - \
+ && echo "deb http://pkg.jenkins-ci.org/debian binary/" >> /etc/apt/sources.list \
  && apt-get update \
  && apt-get install -y jenkins \
  && replace "HTTP_PORT=8080" "HTTP_PORT=10080" -- /etc/default/jenkins
 
 RUN \
-# Get Latest Pipeline Code 
+# Get Latest Pipeline Code
  cd ~/pipeline \
- && git pull  
+ && git pull
 
 # Sbt Feeder
 RUN \
  cd ~/pipeline/myapps/akka/feeder && sbt clean assembly \
 
-# Sbt ML 
+# Sbt ML
 # This is temporary while we figure out how to specify the following dependency as a --package into Spark (note `models` classifier)
 #   edu.stanford.corenlp:stanford-corenlp:${STANFORD_CORENLP_VERSION}:models
 # Classifiers don't appear to be supported by --packages
@@ -380,16 +380,16 @@ RUN \
 # Sbt Streaming
  && cd ~/pipeline/myapps/spark/streaming && sbt clean package \
 
-# Sbt SQL 
+# Sbt SQL
  && cd ~/pipeline/myapps/spark/sql && sbt clean package \
 
-# Sbt Core 
+# Sbt Core
  && cd ~/pipeline/myapps/spark/core && sbt clean package \
 
 # Sbt Tensorframes
  && cd ~/pipeline/myapps/spark/tensorframes && sbt clean package \
 
-# Sbt Flink CEP Streaming  
+# Sbt Flink CEP Streaming
  && cd ~/pipeline/myapps/flink/streaming && sbt clean assembly \
 
 # Sbt Serving Recommendation Service (Finagle)
@@ -404,7 +404,7 @@ RUN \
 # Mvn Cluster-wide Circuit Breaker Metrics Service (Netflix Turbine)
  && cd ~/pipeline/myapps/serving/turbine && mvn -DskipTests clean install \
 
-# Sbt Spark Serving 
+# Sbt Spark Serving
  && cd ~/pipeline/myapps/serving/spark && sbt clean package \
 
 # Sbt Serving Prediction Service (Spring + Netflix)
@@ -419,7 +419,7 @@ RUN \
 # Sbt Codegen
  && cd ~/pipeline/myapps/codegen/spark/1.6.1 && sbt clean package \
 
-# Sbt PMML (Spark 1.6.1) 
+# Sbt PMML (Spark 1.6.1)
  && cd ~/pipeline/myapps/pmml/spark/1.6.1 && mvn clean install \
 
 # Sbt PMML (Spark 2.0.1)
@@ -450,11 +450,11 @@ RUN \
   && pip3 install --upgrade notebook \
   && pip install jupyterhub-dummyauthenticator \
 
-# iPython3 Kernel 
-  && ipython3 kernel install \ 
+# iPython3 Kernel
+  && ipython3 kernel install \
 
 # Keras
-  && pip install keras 
+  && pip install keras
 
 # Spinnaker
 RUN \
@@ -516,7 +516,7 @@ RUN \
 RUN \
   pip install py4j
 
-# Ports to expose 
+# Ports to expose
 EXPOSE 80 6042 9160 9042 9200 7077 8080 8081 6060 6061 6062 6063 6064 6065 8090 10000 50070 50090 9092 6066 9000 19999 6081 7474 8787 5601 8989 7979 4040 4041 4042 4043 4044 4045 4046 4047 4048 4049 4050 4051 4052 4053 4054 4055 4056 4057 4058 4059 4060 6379 8888 54321 8099 8754 7379 6969 6970 6971 6972 6973 6974 6975 6976 6977 6978 6979 6980 5050 5060 7060 8182 9081 8998 9090 5080 5090 5070 8000 8001 6006 3060 9040 8102 22222 10080 5040 8761 7101 5678
 
 WORKDIR /root/pipeline
